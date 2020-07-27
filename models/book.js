@@ -22,4 +22,5 @@ const bookSchema = new mongoose.Schema({
 
 bookSchema.index({ authorId: 1 })
 bookSchema.index({ ISBN: 1 })
+bookSchema.index({ title: 'text', genre: 'text', blurb: 'text' });
 module.exports = mongoose.model("books", bookSchema);

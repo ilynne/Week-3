@@ -47,5 +47,59 @@ module.exports.create = async (bookData) => {
   }
 }
 
+module.exports.getByQuery = (query) => {
+  return Book.find(
+    { $text: { $search: query } },
+    { score: { $meta: 'textScore' } }
+    ).sort({ score: { $meta: 'textScore' }
+  });
+}
+
+module.exports.getAuthorStats = (authorInfo) => {
+  if (authorInfo) {
+    return Book.aggregate([
+      { $group: {
+        _id: '$authorId',
+        numBooks: { $sum: 1 }, titles: { $push: '$title' },
+        averagePageCount: { $avg: "$pageCount" }
+      } },
+      { $addFields: {
+        authorObjectId: { $toObjectId: '$_id' }
+      } },
+      { $lookup: {
+        from: 'authors',
+        localField: 'authorObjectId',
+        foreignField: '_id',
+        as: 'author'
+      } },
+      { $project: {
+        _id: 0,
+        authorId: '$authorObjectId',
+        averagePageCount: 1,
+        numBooks: 1,
+        titles: 1,
+        author: 1 } },
+      { $sort: {
+          authorId: 1 } },
+      { $unwind: '$author' }
+    ]);
+  } else {
+    return Book.aggregate([
+      { $group: {
+        _id: '$authorId',
+        numBooks: { $sum: 1 }, titles: { $push: '$title' },
+        averagePageCount: { $avg: "$pageCount" }
+      } },
+      { $project: {
+        _id: 0,
+        authorId: '$_id',
+        averagePageCount: 1,
+        numBooks: 1,
+        titles: 1 } },
+      { $sort: { authorId: 1 } },
+    ]);
+  }
+}
+
 class BadDataError extends Error {};
 module.exports.BadDataError = BadDataError;

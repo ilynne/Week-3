@@ -22,6 +22,20 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// Stats
+router.get("/authors/stats", async (req, res, next) => {
+  let { authorInfo } = req.query;
+  const stats = await bookDAO.getAuthorStats(authorInfo)
+  res.json(stats);
+})
+
+// Read - all books
+router.get("/search", async (req, res, next) => {
+  let { query } = req.query;
+  const books = await bookDAO.getByQuery(query);
+  res.json(books);
+});
+
 // Read - single book
 router.get("/:id", async (req, res, next) => {
   const book = await bookDAO.getById(req.params.id);
