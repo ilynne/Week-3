@@ -4,8 +4,12 @@ const Book = require('../models/book');
 
 module.exports = {};
 
-module.exports.getAll = (page, perPage) => {
-  return Book.find().limit(perPage).skip(perPage*page).lean();
+module.exports.getAll = (page, perPage, authorId) => {
+  if (authorId) {
+    return Book.find({ authorId: authorId }).limit(perPage).skip(perPage*page).lean();
+  } else {
+    return Book.find().limit(perPage).skip(perPage*page).lean();
+  }
 }
 
 module.exports.getById = (bookId) => {

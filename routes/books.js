@@ -11,7 +11,7 @@ router.post("/", async (req, res, next) => {
   } else {
     try {
       const savedBook = await bookDAO.create(book);
-      res.json(savedBook); 
+      res.json(savedBook);
     } catch(e) {
       if (e instanceof bookDAO.BadDataError) {
         res.status(400).send(e.message);
@@ -34,10 +34,10 @@ router.get("/:id", async (req, res, next) => {
 
 // Read - all books
 router.get("/", async (req, res, next) => {
-  let { page, perPage } = req.query;
+  let { page, perPage, authorId } = req.query;
   page = page ? Number(page) : 0;
   perPage = perPage ? Number(perPage) : 10;
-  const books = await bookDAO.getAll(page, perPage);
+  const books = await bookDAO.getAll(page, perPage, authorId);
   res.json(books);
 });
 
@@ -50,7 +50,7 @@ router.put("/:id", async (req, res, next) => {
   } else {
     try {
       const success = await bookDAO.updateById(bookId, book);
-      res.sendStatus(success ? 200 : 400); 
+      res.sendStatus(success ? 200 : 400);
     } catch(e) {
       if (e instanceof bookDAO.BadDataError) {
         res.status(400).send(e.message);
